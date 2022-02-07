@@ -13,6 +13,7 @@ module Fluent
       config_param :transport, :string, default: "tls"
       config_param :insecure, :bool, default: false
       config_param :trusted_ca_path, :string, default: nil
+      config_param :token, :string, default: nil
       config_section :format do
         config_set_default :@type, DEFAULT_FORMATTER
       end
@@ -32,7 +33,7 @@ module Fluent
         tag = chunk.metadata.tag
         chunk.each do |time, record|
           begin
-            socket.write_nonblock @formatter.format(tag, time, record)
+            socket.write_nonblock @formatter.format(tag, time, record, @token)
             IO.select(nil, [socket], nil, 1) || raise(StandardError.new "ReconnectError")
           rescue => e
             @sockets.delete(socket_key(@transport.to_sym, @host, @port))
