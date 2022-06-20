@@ -36,7 +36,7 @@ module Fluent
       end
 
       def write(chunk)
-        socket = find_or_create_socket(@transport.to_sym, @host, @port)
+        socket = socket_create(@transport.to_sym, @host, @port, socket_options)
         tag = chunk.metadata.tag
         chunk.each do |time, record|
           begin
